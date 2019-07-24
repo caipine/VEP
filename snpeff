@@ -1,0 +1,14 @@
+mkdir snpeff
+mkdir annotated
+foreach s ( "`cat sampls`" )
+
+snpEff  -noStats -csvStats snpeff/${s}_all.csv -Xmx6g hg38 called/${s}_9_somatic_oncefiltered.vcf.gz > annotated/${s}_all.vcf.gz
+
+bcftools view --apply-filters PASS --output-type u annotated/${s}_all.vcf.gz \
+     | rbt vcf-to-txt -g --fmt DP AD --info ANN  \
+     | bgzip -d  > annotated/${s}_all_table.txt
+grep "missense_variant"  annotated/${s}_all_table.txt >     annotated/missense_variant_${s}.txt
+
+end
+
+
